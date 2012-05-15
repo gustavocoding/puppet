@@ -7,9 +7,13 @@ Simple manifest to install MongoDB
 Usage:  
 
 node "node.my.host"  {  
+
     class { 'mongodb': 
-         numa => 'yes', 
+
+         numa => 'yes',  
+
          replicaset => 'myReplSet'  
-    }  
+
+    }   
 
 }  
