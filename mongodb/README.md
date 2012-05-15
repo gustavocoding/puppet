@@ -1,4 +1,16 @@
-puppet
-======
+MongoDB puppet manifest
+=======================
 
-Collection of puppet manifests
+Simple manifest to install MongoDB
+
+Usage:
+
+node "node.my.host"  {
+    class { 'mongodb':
+         numa => 'yes',
+         replicaset => 'myReplSet'
+    }
+
+}
+
+
