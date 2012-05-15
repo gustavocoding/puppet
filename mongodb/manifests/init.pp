@@ -4,7 +4,7 @@ class mongodb($replicaset = "undefined", $numa = "undefined") {
 
         require mongodb::params
 
-	$mongo_tgz = "mongodb-${mongodb::params::arch}-${mongodb::params::version}.tar.gz"
+	$mongo_tgz = "mongodb-${mongodb::params::arch}-${mongodb::params::version}.tgz"
         $base_dir = "${mongodb::params::base}"
         $data_dir = "${mongodb::params::data}"
 
@@ -53,15 +53,13 @@ class mongodb($replicaset = "undefined", $numa = "undefined") {
 		group => "mongodb",
 		alias => "mongo-logfile"
 	}
-
-        file { "$base_dir/${mongo_tgz}":
-                mode => 0644,
-                owner => mongodb,
-                group => mongodb,
-                source => "puppet:///modules/mongodb/${mongo_tgz}",
-                alias => "mongodb-source-tgz",
-                before => Exec["untar-mongo"],
-                require => File["mongo-base"]
+   
+        exec {
+               "download-mongo" :
+               command  => "/usr/bin/wget http://downloads.mongodb.org/linux/${mongo_tgz} -N -P $base_dir/",
+               alias => "mongodb-source-tgz",
+               before => Exec["untar-mongo"],
+               require => File["mongo-base"],
         }
 
 	exec { "untar ${mongo_tgz}":
@@ -70,7 +68,7 @@ class mongodb($replicaset = "undefined", $numa = "undefined") {
                 creates => "$base_dir/mongodb",
                 alias => "untar-mongo",
                 refreshonly => true,
-                subscribe => File["mongodb-source-tgz"],
+                subscribe => Exec["mongodb-source-tgz"],
         }
       
         file { "/etc/init.d/mongodb":
