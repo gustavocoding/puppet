@@ -91,7 +91,7 @@ case "$1" in
         ulimit -n 128000
 	## Start daemon with startproc(8). If this fails
 	## the return value is set appropriately by startproc.
-	<% if numa != "undefined" %> numactl --interleave=all <% end %> /sbin/startproc -u ${MONGO_USER} -g ${MONGO_GID} ${mongodb_BIN} --dbpath ${DBDIR} --logpath ${LOG_PATH} --logappend --rest <% if replicaset != "undefined" %> --replSet <%= replicaset %> <% end %> --nojournal
+	<% if disablenuma != "undefined" %> numactl --interleave=all <% end %> /sbin/startproc -u ${MONGO_USER} -g ${MONGO_GID} ${mongodb_BIN} --config <%= base_dir %>/conf/mongo.conf
 
 	# Remember status and be verbose
 	rc_status -v
