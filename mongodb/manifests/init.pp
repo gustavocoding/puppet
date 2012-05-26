@@ -1,12 +1,14 @@
 # /etc/puppet/modules/mongodb/manifests/init.pp
 
-class mongodb($replicaset = "undefined", $numa = "undefined") {
+class mongodb($replicaset = "undefined", $disablenuma = "undefined") {
 
         require mongodb::params
 
 	$mongo_tgz = "mongodb-${mongodb::params::arch}-${mongodb::params::version}.tgz"
         $base_dir = "${mongodb::params::base}"
         $data_dir = "${mongodb::params::data}"
+
+	$log_path = "$data_dir/logs/mongo.log"
 
         group { "mongodb":
         	ensure  => present
@@ -24,6 +26,20 @@ class mongodb($replicaset = "undefined", $numa = "undefined") {
 		group => "mongodb",
 		alias => "mongo-base"
 	}
+
+        file { "$base_dir/conf":
+               ensure => "directory",
+               owner => "mongodb",
+               group => "mongodb",
+               alias => "mongo-conf",
+                require => File[$base_dir]
+        }
+
+        file { "$base_dir/conf/mongo.conf":
+                mode => 0744,
+                ensure => present,
+                content => template('mongodb/mongodb.conf.erb')
+        }
         
        file { "/data": 
 		ensure => "directory",
