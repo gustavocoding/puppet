@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<configuration>
+  <property>
+    <name>mapred.job.tracker</name>
+    <value><% if master != "localhost" then %><%= master %><% else %><%= @hostname%><% end %>:9001</value>
+  </property>
+  <property>
+    <name>mapred.map.child.java.opts</name>
+    <value><%= mapTaskOpts %></value>
+  </property>
+
+  <% if interface != "default" then %>
+  <property>
+    <name>mapred.datanode.dns.interface</name>
+    <value><%= interface %></value>
+  </property>
+  <property>
+    <name>mapred.tasktracker.dns.interface</name>
+    <value><%= interface %></value>
+  </property>
+  <% end %>
+
+  <property>
+    <name>mapred.reduce.child.java.opts</name>
+    <value><%= reduceTaskOpts %></value>
+  </property>
+  <property>
+    <name>mapred.tasktracker.map.tasks.maximum</name>
+    <value><%= mapTasks %></value>
+  </property>
+  <property>
+    <name>mapred.local.dir</name>
+    <value>/data/hadoop/mapred</value>
+  </property>
+  <property>
+    <name>mapred.tasktracker.reduce.tasks.maximum</name>
+    <value><%= reduceTasks %></value>
+  </property>
+  <property>
+    <name>mapred.compress.map.output</name>
+    <value>true</value>
+  </property>
+ <property>
+    <name>mapred.reduce.slowstart.completed.maps</name>
+    <value>1</value>
+ </property>
+ <property>
+    <name>mapred.reduce.tasks</name>
+    <value><%= jobReduceTasks %></value>
+ </property>
+ <property>
+    <name>mapred.job.reuse.jvm.num.tasks</name>
+    <value>-1</value>
+ </property>
+ <property>
+    <name>mapred.map.output.compression.codec</name>
+    <value>org.apache.hadoop.io.compress.GzipCodec</value>
+  </property>
+</configuration>

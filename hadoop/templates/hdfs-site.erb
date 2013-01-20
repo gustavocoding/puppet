@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<configuration>
+
+  <property>
+    <name>dfs.replication</name>
+    <value>2</value>
+  </property>
+
+  <% if interface != "default" then %>
+  <property>
+    <name>dfs.datanode.dns.interface</name>
+    <value><%= interface %></value>
+  </property>
+  <% end %>
+
+  <property>
+    <name>dfs.name.dir</name>
+    <value>/data/hadoop/hdfs/name</value>
+  </property>
+  <property>
+    <name>dfs.data.dir</name>
+    <value>/data/hadoop/hdfs/data</value>
+  </property>
+  <property>
+    <name>dfs.checkpoint.dir</name>
+    <value>/data/hadoop/hdfs/namesecondary</value>
+    <final>true</final>
+  </property>
+</configuration>

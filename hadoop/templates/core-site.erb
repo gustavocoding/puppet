@@ -1,0 +1,11 @@
+<configuration>
+     <property>
+         <name>fs.default.name</name>
+         <value>hdfs://<% if master != "localhost" then %><%= master %><% else %><%= @hostname%><% end %>:9000</value>
+     </property>
+     <property>
+         <name>hadoop.tmp.dir</name>
+         <value>/data/hadoop</value>
+     </property>
+
+</configuration>

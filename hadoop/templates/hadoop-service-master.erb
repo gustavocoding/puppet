@@ -1,0 +1,89 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          hadoop services
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Description:       Hadoop services
+# Short-Description: Enable Hadoop services including hdfs
+### END INIT INFO
+
+HADOOP_BIN=$HADOOP_INSTALL/bin
+NAME=hadoop
+DESC=hadoop
+USER=hadoop
+
+RETVAL=0
+set -e
+
+test -x ${HADOOP_BIN} || { echo "${HADOOP_BIN} not installed";
+        if [ "$1" = "stop" ]; then exit 0;
+        else exit 5; fi; }
+
+start_hadoop () {
+    set +e
+    test -e '/data/hadoop/hdfs/name/image' || { echo "Namenode not formatted. Formatting it now";
+        su $USER -s /bin/sh -c 'yes Y | hadoop namenode -format'; }
+    su $USER -s /bin/sh -c "ssh -n -o StrictHostKeyChecking=no localhost who"
+    cat $HADOOP_INSTALL/conf/slaves | while read line; do su $USER -c "ssh -n -o StrictHostKeyChecking=no $line who" ; done 
+    su $USER -s /bin/sh -c $HADOOP_BIN/start-dfs.sh
+    case "$?" in
+      0)
+        echo SUCCESS
+        RETVAL=0
+        ;;
+      1)
+        echo TIMEOUT
+        RETVAL=1
+        ;;
+      *)
+        echo FAILED
+        RETVAL=1
+        ;;
+    esac
+    set -e
+}
+
+stop_hadoop () {
+    set +e
+    if [ $RETVAL = 0 ]; then
+        su $USER -s /bin/sh -c $HADOOP_BIN/stop-dfs.sh
+        RETVAL=$?
+        if [ $RETVAL != 0 ] ; then
+            echo FAILED
+        fi
+    else
+        echo No nodes running
+        RETVAL=0
+    fi
+    set -e
+}
+
+restart_hadoop() {
+    stop_hadoop
+    start_hadoop
+}
+
+case "$1" in
+    start)
+        echo -n "Starting $DESC: "
+        start_hadoop
+        echo "$NAME."
+        ;;
+    stop)
+        echo -n "Stopping $DESC: "
+        stop_hadoop
+        echo "$NAME."
+        ;;
+    force-reload|restart)
+        echo -n "Restarting $DESC: "
+        restart_hadoop
+        echo "$NAME."
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|force-reload}" >&2
+        RETVAL=1
+        ;;
+esac
+exit $RETVAL
