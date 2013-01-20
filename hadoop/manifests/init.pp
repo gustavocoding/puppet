@@ -7,14 +7,27 @@ class hadoop($slaves = 'localhost', $master = 'localhost', $mapTaskOpts = '-Xmx1
         $version = "1.1.1"
 
         $base = "/opt/hadoop/"
+  
+        $dataroot = "/data/"
 
-        $data = "/data/hadoop/"
+        $data = "$dataroot/hadoop" 
 
         $logs = "/data/logs/hadoop"
  
 	if defined(Group[$group]) == false {
             group { "$group":
                 ensure  => present
+            }
+        }
+
+	if defined(File[$dataroot]) == false {
+            file { "$dataroot":
+                ensure  => present
+		ensure => "directory",
+		owner => $user, 
+		group => $group, 
+		alias => "dataroot",
+		require => [ User["$user"], Group["$group"] ]
             }
         }
 
@@ -51,7 +64,8 @@ class hadoop($slaves = 'localhost', $master = 'localhost', $mapTaskOpts = '-Xmx1
     		ensure => "directory",
     		owner  => $user,
     		group  => $group,
-    		mode   => 0755
+    		mode   => 0755,
+		require => File["$dataroot"]
 	}
 
         file { "$data/hdfs":
