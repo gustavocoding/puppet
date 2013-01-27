@@ -1,18 +1,18 @@
 # /etc/puppet/modules/hadoop/manifests/init.pp
 
-class hadoop($slaves = 'localhost', $master = 'localhost', $mapTaskOpts = '-Xmx1G', $reduceTaskOpts = '-Xmx2G', $mapTasks = '2', $reduceTasks = '2', $jobReduceTasks = '1', $interface = 'default')  {
+class hadoop($slaves = ['localhost'], $master = 'localhost', $mapTaskOpts = '-Xmx1G', $reduceTaskOpts = '-Xmx2G', $mapTasks = "$::processorcount", $reduceTasks = '2', $jobReduceTasks = '2', $interface = 'default')  {
 
         $user = "hadoop"
-        $group = "synapse"
+        $group = "hadoop"
         $version = "1.1.1"
 
         $base = "/opt/hadoop/"
   
         $dataroot = "/data/"
 
-        $data = "$dataroot/hadoop" 
+        $data = "$dataroot/hadoop/" 
 
-        $logs = "/data/logs/hadoop"
+        $logs = "/data/hadoop/logs"
  
 	if defined(Group[$group]) == false {
             group { "$group":
@@ -22,7 +22,6 @@ class hadoop($slaves = 'localhost', $master = 'localhost', $mapTaskOpts = '-Xmx1
 
 	if defined(File[$dataroot]) == false {
             file { "$dataroot":
-                ensure  => present
 		ensure => "directory",
 		owner => $user, 
 		group => $group, 
@@ -33,13 +32,17 @@ class hadoop($slaves = 'localhost', $master = 'localhost', $mapTaskOpts = '-Xmx1
 
         user { "$user":
                 ensure => present,
-                password => "!!",
                 gid => $group,
                 groups => $group,
                 shell => "/bin/bash",
                 home => "/home/$user",
                 require => Group["$group"],
         }
+
+        exec { "initial_password": 
+		command => "/usr/sbin/usermod -p $6$BlODgWJe$eQ.xkRSzkXpMudl831q78I8lh4hHLVGVKds.6hpcPe348uoqWXmlf6PC1s4TfmPhYrPHo6dbdbmNkz2UxewfS1 $user",
+		require => User[$user]
+	}
 
 	file { "/home/$user":
 		ensure => "directory",
@@ -50,7 +53,7 @@ class hadoop($slaves = 'localhost', $master = 'localhost', $mapTaskOpts = '-Xmx1
 	}
 
         file { "$base":
-                mode => 0777,
+                mode => 0744,
 		ensure => "directory",
 		owner => "$user",
 		group => "$group",
@@ -138,21 +141,21 @@ class hadoop($slaves = 'localhost', $master = 'localhost', $mapTaskOpts = '-Xmx1
                 require => File["hadoop-home"]
 	}
 
-	file { "/home/$user/.ssh/id_rsa.pub":
+	file { "/home/$user/.ssh/id_dsa.pub":
 		ensure => present,
 		owner => "$user",
 		group => "$group",
 		mode => "644",
-		source => "puppet:///modules/hadoop/id_rsa.pub",
+		source => "puppet:///modules/hadoop/id_dsa.pub",
 		require => File["hadoop-ssh-dir"],
 	}
 
-	file { "/home/$user/.ssh/id_rsa":
+	file { "/home/$user/.ssh/id_dsa":
 		ensure => present,
 		owner => "$user",
 		group => "$group",
 		mode => "600",
-		source => "puppet:///modules/hadoop/id_rsa",
+		source => "puppet:///modules/hadoop/id_dsa",
 		require => File["hadoop-ssh-dir"],
 	}
 
@@ -161,12 +164,12 @@ class hadoop($slaves = 'localhost', $master = 'localhost', $mapTaskOpts = '-Xmx1
 		owner => "$user",
 		group => "$group",
 		mode => "644",
-		source => "puppet:///modules/hadoop/id_rsa.pub",
+		source => "puppet:///modules/hadoop/id_dsa.pub",
 		require => File["hadoop-ssh-dir"],
 	}	
         
 	file { "${base}/hadoop-${version}.tar.gz":
-		mode => 0777,
+		mode => 0744,
 		owner => $user,
 		group => $group,
 		source => "puppet:///modules/hadoop/hadoop-${version}.tar.gz",
