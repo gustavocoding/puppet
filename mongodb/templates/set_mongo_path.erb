@@ -1,2 +1,2 @@
-export MONGO_HOME=<%= scope.lookupvar 'mongodb::params::base' %>mongodb-<%= scope.lookupvar 'mongodb::params::arch' %>-<%= scope.lookupvar 'mongodb::params::version' %>/
+export MONGO_HOME=<%= installdir %>/
 export PATH=$MONGO_HOME/bin:$PATH

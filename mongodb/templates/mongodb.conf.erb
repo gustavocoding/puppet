@@ -1,6 +1,6 @@
-dbpath = <%= data_dir %> 
+dbpath = <%= datadir %> 
 logpath = <%= log_path %>
 logappend = true
 rest = true
-journal = true
+journal = false
 <% if replicaset != "undefined" %> replSet=<%= replicaset %> <% end %>

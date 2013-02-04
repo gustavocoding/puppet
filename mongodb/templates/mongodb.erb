@@ -32,8 +32,8 @@
 
 # Check for missing binaries (stale symlinks should not happen)
 # Note: Special treatment of stop for LSB conformance
-mongodb_BIN=<%= scope.lookupvar 'mongodb::params::base' %>mongodb-<%= scope.lookupvar 'mongodb::params::arch' %>-<%= scope.lookupvar 'mongodb::params::version' %>/bin/mongod
-DBDIR=<%= scope.lookupvar 'mongodb::params::data' %>
+mongodb_BIN=<%= installdir %>/bin/mongod
+DBDIR=<%= datadir %>
 LOG_PATH=$DBDIR/logs/mongo.log
 
 test -x ${mongodb_BIN} || { echo "${mongodb_BIN} not installed"; 
@@ -91,7 +91,7 @@ case "$1" in
         ulimit -n 128000
 	## Start daemon with startproc(8). If this fails
 	## the return value is set appropriately by startproc.
-	<% if disablenuma != "undefined" %> numactl --interleave=all <% end %> /sbin/startproc -u ${MONGO_USER} -g ${MONGO_GID} ${mongodb_BIN} --config <%= base_dir %>/conf/mongo.conf
+	<% if disablenuma != "undefined" %> numactl --interleave=all <% end %> /sbin/startproc -u ${MONGO_USER} -g ${MONGO_GID} ${mongodb_BIN} --config <%= installdir %>/conf/mongo.conf
 
 	# Remember status and be verbose
 	rc_status -v
