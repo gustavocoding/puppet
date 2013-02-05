@@ -5,7 +5,7 @@ require 'puppet/file_serving'
 require 'puppet/util'
 require "puppet/type/file"
 require 'puppet/file_serving/base'
-require 'puppet/file_serving/indirection_hooks'
+#require 'puppet/file_serving/indirection_hooks'
 require 'puppet/file_serving/content'
 require 'fileutils'
 require 'net/http'
